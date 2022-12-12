@@ -1,28 +1,20 @@
-import requests
-from multiprocessing.dummy import Pool
-
+import threading
 import requests
 
-pool = Pool(20) # Creates a pool with ten threads; more threads = more concurrency.
-                # "pool" is a module attribute; you can be sure there will only
-                # be one of them in your application
-                # as modules are cached after initialization.
+def send_request():
+    url = "http://localhost:8000/user/all"
+    response = requests.get(url)
+    print(response.status_code)
 
-# Constants
-URL = 'https://fad3-142-189-202-112.ngrok.io/user/all'
+num_requests = 10000
 
-def send_fake_data():
-    request_data = requests.get("https://192.168.2.23")
-    print("request_data.text")
-    print(request_data.text)
+threads = []
+for i in range(num_requests):
+    thread = threading.Thread(target=send_request)
+    threads.append(thread)
 
-    # futures = []
-    # for x in range(1000):
-    #     futures.append(pool.apply_async(requests.get, [""]))
-    # for future in futures:
-    #     print(future.get())
+for thread in threads:
+    thread.start()
 
-
-send_fake_data()
-
-
+for thread in threads:
+    thread.join()
